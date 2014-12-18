@@ -46,9 +46,9 @@ GLfloat angulo = 0;
 GLfloat elevadora;
 GLfloat desplazamiento;
 GLfloat volante;
-GLfloat vel_elevadora=5;
-GLfloat vel_desplazamiento=5;
-GLfloat vel_volante=5;
+GLfloat vel_elevadora = 5;
+GLfloat vel_desplazamiento = 5;
+GLfloat vel_volante = 5;
 
 // variables que definen la posicion de la camara en coordenadas polares
 GLfloat Observer_distance;
@@ -271,17 +271,17 @@ void idle()
 }
 
 //**************************************************************************
-//
-//***************************************************************************
+// Luces
+//**************************************************************************
 
 void draw_lights(void)
 {
     luz0.setID(GL_LIGHT0);
     luz0.setDireccional(false);
-    luz0.setPosicion(_vertex3f(10,10,-5));
-    luz0.setAmbiental(_vertex4f(0.3,0.3,0.3,1));
+    luz0.setPosicion(_vertex3f(10,-10,-5));
+    luz0.setAmbiental(_vertex4f(0.5,0.5,0.5,1));
     luz0.setDifuso(_vertex4f(0.8,0.8,0.8,1));
-    luz0.setEspecular(_vertex4f(0.5,0.5,0.5,1));
+    luz0.setEspecular(_vertex4f(0.9,0.9,0.9,1));
 
     luz1.setID(GL_LIGHT1);
     luz1.setDireccional(true);
@@ -294,6 +294,10 @@ void draw_lights(void)
     luz0.activar();
     luz1.activar();
 }
+
+//**************************************************************************
+// Escena
+//**************************************************************************
 
 void draw_scene(void)
 {

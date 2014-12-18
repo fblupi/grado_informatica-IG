@@ -15,9 +15,7 @@ void Luz::activar() {
 
     glEnable(GL_LIGHTING);
     glEnable(id);
-
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
     glPushMatrix();
     if(direccional) {
         glRotatef(alfa,0,1,0);
@@ -27,8 +25,8 @@ void Luz::activar() {
     glLightfv(id,GL_AMBIENT,(GLfloat *) &ambiental);
     glLightfv(id,GL_SPECULAR,(GLfloat *) &especular);
     glLightfv(id,GL_DIFFUSE,(GLfloat *) &difuso);
-    glDisable(GL_LIGHTING);
     glPopMatrix();
+    glDisable(GL_LIGHTING);
 }
 
 void Luz::desactivar() {
