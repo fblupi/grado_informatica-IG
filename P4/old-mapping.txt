@@ -1,0 +1,38 @@
+/** OLD *****************************************
+    vector<_vertex2f> v(Vertices.size()); // Tamaño vector resultado = Tamaño vector Vertices
+    float tama = Vertices[m-1].y-Vertices[0].y; // Tamaño total del ply para escalarlo a tamaño 1
+    float var0 = 1.0/n; // Distancia horizontal entre puntos (siempre es la misma)
+    vector<float> var1(m); // Vector que guarda la distancia entre el punto N y N-1
+    float suma=0;
+    var1[0]=suma;
+    for(unsigned int i=1; i<var1.size(); i++) {
+        suma += (Vertices[i].y - Vertices[i-1].y)/tama; // Distancia vertical entre dos puntos
+        var1[i] = suma;
+    }
+    /** ASIGNACION A VERTICES OLD *******************
+    for(unsigned int i=0; i<Vertices.size(); i++) {
+        // 1-X para darle la vuelta a la textura que está al reves
+        v[i].s = 1-i/m*var0; // i/m para identificar en qué fila estamos (n_rotacion)
+        v[i].t = 1-var1[i%m]; // i%m para identificar en qué columna estamos (vertices iniciales)
+    }
+    *************************************************
+    for(unsigned int i=0; i<n; i++) {
+        for(unsigned int j=0; j<m; j++) {
+            v[i*m+j].s = 1-i*var0;  // s = i*distancia horizontal entre dos puntos
+            v[i*m+j].t = 1-var1[j]; // t = distancia vertical entre j y j-1
+        }
+    }
+
+    Map = v; // Guardamos resultados
+
+    /** OLD *****************************************
+    vector<_vertex2f> v(Vertices.size());
+    float var0 = 1.0/n;
+    float var1 = 1.0/(m-1);
+    for(unsigned int i=0; i<Vertices.size(); i++) {
+        v[i].s = 1-i/m*var0;
+        v[i].t = 1-i%m*var1;
+    }
+    Map = v;
+    *************************************************
+    *************************************************/
