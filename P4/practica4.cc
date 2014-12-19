@@ -657,8 +657,8 @@ void initialize(void)
     peon_blanco->calcular_normales_vertices();
 
     // se definen los materiales
-    peon_madera->setAmbiental(_vertex4f(0.5,0.5,0.5,1));
-    peon_madera->setDifusa(_vertex4f(0.6,0.6,0.6,1));
+    peon_madera->setAmbiental(_vertex4f(0.3,0.3,0.3,1));
+    peon_madera->setDifusa(_vertex4f(0.5,0.5,0.5,1));
     peon_madera->setEspecular(_vertex4f(1,1,1,1));
     peon_madera->setBrillo(80);
 
