@@ -252,14 +252,8 @@ void idle()
         if(activo) {
             glMatrixMode(GL_MODELVIEW);
             glPushMatrix();
-            glLoadIdentity();
-            angulo += 5;
-            luz2.setID(GL_LIGHT2);
-            luz2.setDireccional(true);
+            angulo += 1;
             luz2.setPosicion(_vertex3f(-sin(angulo*M_PI/180),cos(angulo*M_PI/180),0));
-            luz2.setAmbiental(_vertex4f(0.3,0.1,0.1,1));
-            luz2.setDifuso(_vertex4f(0.7,0.2,0.2,1));
-            luz2.setEspecular(_vertex4f(1,0.2,0.2,1));
             luz2.activar();
             glPopMatrix();
         } else {
@@ -276,20 +270,6 @@ void idle()
 
 void draw_lights(void)
 {
-    luz0.setID(GL_LIGHT0);
-    luz0.setDireccional(false);
-    luz0.setPosicion(_vertex3f(10,-10,-5));
-    luz0.setAmbiental(_vertex4f(0.5,0.5,0.5,1));
-    luz0.setDifuso(_vertex4f(0.8,0.8,0.8,1));
-    luz0.setEspecular(_vertex4f(0.9,0.9,0.9,1));
-
-    luz1.setID(GL_LIGHT1);
-    luz1.setDireccional(true);
-    luz1.setPosicion(_vertex3f(1,1,1));
-    luz1.setDireccion(alfa,beta);
-    luz1.setAmbiental(_vertex4f(0.3,0.3,0.3,1));
-    luz1.setDifuso(_vertex4f(0.7,0.7,0.7,1));
-    luz1.setEspecular(_vertex4f(1,1,1,1));
 
     luz0.activar();
     luz1.activar();
@@ -631,6 +611,29 @@ void initialize(void)
     glEnable(GL_DEPTH_TEST);
     change_projection();
     glViewport(0,0,UI_window_width,UI_window_height);
+
+    // se declaran las luces
+    luz0.setID(GL_LIGHT0);
+    luz0.setDireccional(false);
+    luz0.setPosicion(_vertex3f(10,-10,-5));
+    luz0.setAmbiental(_vertex4f(0.5,0.5,0.5,1));
+    luz0.setDifuso(_vertex4f(0.8,0.8,0.8,1));
+    luz0.setEspecular(_vertex4f(0.9,0.9,0.9,1));
+
+    luz1.setID(GL_LIGHT1);
+    luz1.setDireccional(true);
+    luz1.setPosicion(_vertex3f(1,1,1));
+    luz1.setDireccion(alfa,beta);
+    luz1.setAmbiental(_vertex4f(0.3,0.3,0.3,1));
+    luz1.setDifuso(_vertex4f(0.7,0.7,0.7,1));
+    luz1.setEspecular(_vertex4f(1,1,1,1));
+
+    luz2.setID(GL_LIGHT2);
+    luz2.setDireccional(true);
+    luz2.setPosicion(_vertex3f(0,0,0));
+    luz2.setAmbiental(_vertex4f(0.3,0.1,0.1,1));
+    luz2.setDifuso(_vertex4f(0.7,0.2,0.2,1));
+    luz2.setEspecular(_vertex4f(1,0.2,0.2,1));
 
     // se modelan los objetos
     // practica 4
