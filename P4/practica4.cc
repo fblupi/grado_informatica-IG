@@ -539,7 +539,13 @@ void normal_keys(unsigned char Tecla1,int x,int y)
             case 'W':
                 activo = true;
                 break;
+            case 'w':
+                activo = true;
+                break;
             case 'E':
+                activo = false;
+                break;
+            case 'e':
                 activo = false;
                 break;
             // Cambiar de escena
