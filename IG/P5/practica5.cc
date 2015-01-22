@@ -21,6 +21,28 @@ using namespace std;
 const int AXIS_SIZE=5000;
 const int BUFFER_SIZE=512;
 
+/*
+ *
+ *
+const int NAMES_MAX_SIZE=10;
+const int OBJETOS_MAX_SIZE=10;
+
+typedef struct {
+    int tama;
+    int names[NAMES_MAX_SIZE];
+    float zmin;
+    float zmax;
+} Objeto;
+
+typedef struct {
+    int tama;
+    Objeto objeto[OBJETOS_MAX_SIZE];
+} Seleccion;
+
+Seleccion seleccion;
+*
+*/
+
 // constantes globales y flags
 int modo = 6;
 int figura = 1;
@@ -198,13 +220,13 @@ void draw_objects()
             beethoven->dibujar(modo);
             glPopMatrix();
             glPushMatrix();
+            glScalef(0.1,0.1,0.1);
+            coche->dibujar(modo);
+            glPopMatrix();
+            glPushMatrix();
             glTranslatef(0,0,-1);
             glScalef(0.05,0.05,0.05);
             hormiga->dibujar(modo);
-            glPopMatrix();
-            glPushMatrix();
-            glScalef(0.1,0.1,0.1);
-            coche->dibujar(modo);
             glPopMatrix();
             break;
     }
@@ -221,15 +243,15 @@ void draw_objects_with_names() {
             beethoven->dibujar(modo);
             glPopMatrix();
             glPushMatrix();
-            glTranslatef(0,0,-1);
-            glScalef(0.05,0.05,0.05);
+            glScalef(0.1,0.1,0.1);
             glPushName(2);
-            hormiga->dibujar(modo);
+            coche->dibujar(modo);
             glPopMatrix();
             glPushMatrix();
-            glScalef(0.1,0.1,0.1);
+            glTranslatef(0,0,-1);
+            glScalef(0.05,0.05,0.05);
             glPushName(3);
-            coche->dibujar(modo);
+            hormiga->dibujar(modo);
             glPopMatrix();
             break;
     }
@@ -712,20 +734,6 @@ void special_keys(int Tecla1,int x,int y)
 //***************************************************************************
 // Funcion selección al hacer click
 //***************************************************************************
-void processHits(GLint hits, GLuint buffer) {
-    unsigned int i,j;
-    GLuint names, *ptr, ii, jj;
-    ptr = (GLuint *) buffer;
-    for(i=0; i<hits; i++) {
-        names = *ptr;
-        ptr+=3;
-        for(j=0; j<names; j++) {
-            cout << *ptr;
-            ptr++;
-        }
-        cout << endl;
-    }
-}
 
 int pick(unsigned int x, unsigned int y) {
     GLuint Selection_buffer[BUFFER_SIZE];
@@ -742,16 +750,42 @@ int pick(unsigned int x, unsigned int y) {
     glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane);
     draw_objects_with_names();
     Hits = glRenderMode(GL_RENDER);
-    processHits(Hits,*Selection_buffer);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane);
+
 
     if(Hits>0) {
         return Selection_buffer[0];
     } else {
         return -1;
     }
+
+    /*
+     * NO FUNCIONA
+     *
+    seleccion.tama = Hits;
+    for(unsigned int i=0,k=0; i<seleccion.tama; i++,k+=3) {
+        seleccion.objeto[i].tama = Selection_buffer[k];
+        seleccion.objeto[i].zmin = (GLfloat)Selection_buffer[k+1]/0xFFFFFFFF;
+        seleccion.objeto[i].zmax = (GLfloat)Selection_buffer[k+2]/0xFFFFFFFF;
+        for(unsigned int j=0; j<seleccion.objeto[i].tama; j++,k++) {
+            seleccion.objeto[i].names[j] = Selection_buffer[k+3];
+        }
+    }
+    float minimo = INFINITY;
+    int resultado = -1;
+    if(seleccion.tama>0) {
+        for(unsigned int i=0; i<seleccion.tama;i++) {
+            if(seleccion.objeto[i].names[0] != -1 && seleccion.objeto[i].zmin < minimo) {
+                minimo = seleccion.objeto[i].zmin;
+                resultado = seleccion.objeto[i].names[0];
+            }
+        }
+    }
+    return resultado;
+    *
+    */
 }
 
 //***************************************************************************
@@ -788,30 +822,30 @@ void click_raton(int boton, int estado, int x, int y) {
                         }
                         break;
                     case 2:
-                        cout << "Hormiga seleccionada" << endl;
-                        if(pintado[1]) {
-                            hormiga->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
-                            hormiga->setDifusa(_vertex4f(0.6,0.6,0.5,1));
-                            hormiga->setEspecular(_vertex4f(0.6,0.6,0.5,1));
-                            pintado[1] = false;
-                        } else {
-                            hormiga->setAmbiental(_vertex4f(0.7,0.1,0.1,1));
-                            hormiga->setDifusa(_vertex4f(0.7,0.1,0.1,1));
-                            hormiga->setEspecular(_vertex4f(0.7,0.1,0.1,1));
-                            pintado[1] = true;
-                        }
-                        break;
-                    case 3:
                         cout << "Coche seleccionado" << endl;
-                        if(pintado[2]) {
+                        if(pintado[1]) {
                             coche->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
                             coche->setDifusa(_vertex4f(0.6,0.6,0.5,1));
                             coche->setEspecular(_vertex4f(0.6,0.6,0.5,1));
-                            pintado[2] = false;
+                            pintado[1] = false;
                         } else {
                             coche->setAmbiental(_vertex4f(0.7,0.1,0.1,1));
                             coche->setDifusa(_vertex4f(0.7,0.1,0.1,1));
                             coche->setEspecular(_vertex4f(0.7,0.1,0.1,1));
+                            pintado[1] = true;
+                        }
+                        break;
+                    case 3:
+                        cout << "Hormiga seleccionada" << endl;
+                        if(pintado[2]) {
+                            hormiga->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
+                            hormiga->setDifusa(_vertex4f(0.6,0.6,0.5,1));
+                            hormiga->setEspecular(_vertex4f(0.6,0.6,0.5,1));
+                            pintado[2] = false;
+                        } else {
+                            hormiga->setAmbiental(_vertex4f(0.7,0.1,0.1,1));
+                            hormiga->setDifusa(_vertex4f(0.7,0.1,0.1,1));
+                            hormiga->setEspecular(_vertex4f(0.7,0.1,0.1,1));
                             pintado[2] = true;
                         }
                         break;
