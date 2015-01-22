@@ -19,24 +19,28 @@ using namespace std;
 
 // tamaño de los ejes
 const int AXIS_SIZE=5000;
+const int BUFFER_SIZE=512;
 
 // constantes globales y flags
 int modo = 6;
 int figura = 1;
-bool activo = false;
 int practica = 5;
+int mouse_x, mouse_y;
+bool activo = false;
 bool modelado = false;
 bool subiendo = true;
 bool avanzando = true;
+bool click_derecho = false;
+vector<bool> pintado(3,false);
 Figura *peon_madera;
 Figura *peon_negro;
 Figura *peon_blanco;
-Lata *lata;
-Torillo * torillo;
 Figura *peon;
 Figura *beethoven;
 Figura *hormiga;
 Figura *coche;
+Lata *lata;
+Torillo * torillo;
 Luz luz0;
 Luz luz1;
 Luz luz2;
@@ -206,6 +210,31 @@ void draw_objects()
     }
 }
 
+void draw_objects_with_names() {
+    switch(practica) {
+        case 5:
+            glMatrixMode(GL_MODELVIEW);
+            glPushMatrix();
+            glTranslatef(0,0,0.75);
+            glScalef(0.1,0.1,0.1);
+            glPushName(1);
+            beethoven->dibujar(modo);
+            glPopMatrix();
+            glPushMatrix();
+            glTranslatef(0,0,-1);
+            glScalef(0.05,0.05,0.05);
+            glPushName(2);
+            hormiga->dibujar(modo);
+            glPopMatrix();
+            glPushMatrix();
+            glScalef(0.1,0.1,0.1);
+            glPushName(3);
+            coche->dibujar(modo);
+            glPopMatrix();
+            break;
+    }
+}
+
 //**************************************************************************
 // Funcion que anima los objetos
 //**************************************************************************
@@ -304,6 +333,15 @@ void change_window_size(int Ancho1,int Alto1)
     change_projection();
     glViewport(0,0,Ancho1,Alto1);
     glutPostRedisplay();
+
+/*** NEW: No se deforma al cambiar tamaño
+    change_projection();
+    glViewport(0,0,Ancho1,Alto1);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60,(GLfloat)Ancho1/(GLfloat)Alto1,1.0,100.0);
+    glMatrixMode(GL_MODELVIEW);
+**************************************/
 }
 
 //***************************************************************************
@@ -672,11 +710,153 @@ void special_keys(int Tecla1,int x,int y)
 }
 
 //***************************************************************************
+// Funcion selección al hacer click
+//***************************************************************************
+void processHits(GLint hits, GLuint buffer) {
+    unsigned int i,j;
+    GLuint names, *ptr, ii, jj;
+    ptr = (GLuint *) buffer;
+    for(i=0; i<hits; i++) {
+        names = *ptr;
+        ptr+=3;
+        for(j=0; j<names; j++) {
+            cout << *ptr;
+            ptr++;
+        }
+        cout << endl;
+    }
+}
+
+int pick(unsigned int x, unsigned int y) {
+    GLuint Selection_buffer[BUFFER_SIZE];
+    GLint Hits,Viewport[4];
+
+    glGetIntegerv(GL_VIEWPORT,Viewport);
+    glSelectBuffer(BUFFER_SIZE,Selection_buffer);
+
+    glRenderMode(GL_SELECT);
+    glInitNames();
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPickMatrix(x,Viewport[3]-y,5.0,5.0,Viewport);
+    glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane);
+    draw_objects_with_names();
+    Hits = glRenderMode(GL_RENDER);
+    processHits(Hits,*Selection_buffer);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane);
+
+    if(Hits>0) {
+        return Selection_buffer[0];
+    } else {
+        return -1;
+    }
+}
+
+//***************************************************************************
+// Funciones llamadas cuando se produce un evento con el ratón
+//
+// el evento manda a la funcion:
+// botón del raton
+// estado del raton
+// posicion x del raton
+// posicion y del raton
+//***************************************************************************
+
+void click_raton(int boton, int estado, int x, int y) {
+    int encontrado;
+    switch(boton) {
+        case GLUT_LEFT_BUTTON:
+            if(practica == 5 && estado == GLUT_DOWN) {
+                click_derecho = false;
+                encontrado = pick(x,y);
+                cout << endl << "MODO SELECCION" << endl;
+                switch(encontrado) {
+                    case 1:
+                        cout << "Beethoven seleccionado" << endl;
+                        if(pintado[0]) {
+                            beethoven->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
+                            beethoven->setDifusa(_vertex4f(0.6,0.6,0.5,1));
+                            beethoven->setEspecular(_vertex4f(0.6,0.6,0.5,1));
+                            pintado[0] = false;
+                        } else {
+                            beethoven->setAmbiental(_vertex4f(0.7,0.1,0.1,1));
+                            beethoven->setDifusa(_vertex4f(0.7,0.1,0.1,1));
+                            beethoven->setEspecular(_vertex4f(0.7,0.1,0.1,1));
+                            pintado[0] = true;
+                        }
+                        break;
+                    case 2:
+                        cout << "Hormiga seleccionada" << endl;
+                        if(pintado[1]) {
+                            hormiga->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
+                            hormiga->setDifusa(_vertex4f(0.6,0.6,0.5,1));
+                            hormiga->setEspecular(_vertex4f(0.6,0.6,0.5,1));
+                            pintado[1] = false;
+                        } else {
+                            hormiga->setAmbiental(_vertex4f(0.7,0.1,0.1,1));
+                            hormiga->setDifusa(_vertex4f(0.7,0.1,0.1,1));
+                            hormiga->setEspecular(_vertex4f(0.7,0.1,0.1,1));
+                            pintado[1] = true;
+                        }
+                        break;
+                    case 3:
+                        cout << "Coche seleccionado" << endl;
+                        if(pintado[2]) {
+                            coche->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
+                            coche->setDifusa(_vertex4f(0.6,0.6,0.5,1));
+                            coche->setEspecular(_vertex4f(0.6,0.6,0.5,1));
+                            pintado[2] = false;
+                        } else {
+                            coche->setAmbiental(_vertex4f(0.7,0.1,0.1,1));
+                            coche->setDifusa(_vertex4f(0.7,0.1,0.1,1));
+                            coche->setEspecular(_vertex4f(0.7,0.1,0.1,1));
+                            pintado[2] = true;
+                        }
+                        break;
+                    default:
+                        cout << "Nada seleccionado" << endl;
+                        break;
+                }
+            }
+            break;
+        case GLUT_RIGHT_BUTTON:
+            if(estado == GLUT_DOWN) {
+                click_derecho = true;
+                mouse_x = x;
+                mouse_y = y;
+                glutPostRedisplay();
+            }
+            break;
+        case 3:
+            click_derecho = false;
+            Observer_distance/=1.1;
+            glutPostRedisplay();
+            break;
+        case 4:
+            click_derecho = false;
+            Observer_distance*=1.1;
+            glutPostRedisplay();
+            break;
+    }
+}
+
+void raton_movido(int x, int y) {
+    if(click_derecho) {
+        Observer_angle_x += (y - mouse_y);
+        Observer_angle_y += (x - mouse_x);
+        mouse_x = x;
+        mouse_y = y;
+        glutPostRedisplay();
+    }
+}
+
+//***************************************************************************
 // Funcion de incializacion
 //***************************************************************************
 
-void initialize(void)
-{
+void initialize(void) {
     // se inicalizan la ventana y los planos de corte
     Window_width=.5;
     Window_height=.5;
@@ -772,16 +952,28 @@ void initialize(void)
     beethoven->model_ply("D://PLY//beethoven");
     beethoven->calcular_normales_triangulos();
     beethoven->calcular_normales_vertices();
+    beethoven->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
+    beethoven->setDifusa(_vertex4f(0.6,0.6,0.5,1));
+    beethoven->setEspecular(_vertex4f(0.6,0.6,0.5,1));
+    beethoven->setBrillo(40);
 
     hormiga = new Figura();
     hormiga->model_ply("D://PLY//ant");
     hormiga->calcular_normales_triangulos();
     hormiga->calcular_normales_vertices();
+    hormiga->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
+    hormiga->setDifusa(_vertex4f(0.6,0.6,0.5,1));
+    hormiga->setEspecular(_vertex4f(0.6,0.6,0.5,1));
+    hormiga->setBrillo(40);
 
     coche = new Figura();
     coche->model_ply("D://PLY//big_dodge");
     coche->calcular_normales_triangulos();
     coche->calcular_normales_vertices();
+    coche->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
+    coche->setDifusa(_vertex4f(0.6,0.6,0.5,1));
+    coche->setEspecular(_vertex4f(0.6,0.6,0.5,1));
+    coche->setBrillo(40);
 
     glutIdleFunc(idle);
 }
@@ -794,8 +986,7 @@ void initialize(void)
 // bucle de eventos
 //***************************************************************************
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     // se llama a la inicialización de glut
     glutInit(&argc, argv);
 
@@ -836,6 +1027,10 @@ int main(int argc, char **argv)
     glutKeyboardFunc(normal_keys);
     // asignación de la funcion llamada "tecla_Especial" al evento correspondiente
     glutSpecialFunc(special_keys);
+    // Actuación sobre el ratón
+    glutMouseFunc(click_raton);
+    // Movimiento de ratón con botón pulsado
+    glutMotionFunc(raton_movido);
 
     // funcion de inicialización
     initialize();
