@@ -1,5 +1,5 @@
 //**************************************************************************
-// Práctica 4
+// Práctica 5
 //
 // Francisco Javier Bolívar Lupiáñez
 //**************************************************************************
@@ -20,28 +20,6 @@ using namespace std;
 // tamaño de los ejes
 const int AXIS_SIZE=5000;
 const int BUFFER_SIZE=512;
-
-/*
- *
- *
-const int NAMES_MAX_SIZE=10;
-const int OBJETOS_MAX_SIZE=10;
-
-typedef struct {
-    int tama;
-    int names[NAMES_MAX_SIZE];
-    float zmin;
-    float zmax;
-} Objeto;
-
-typedef struct {
-    int tama;
-    Objeto objeto[OBJETOS_MAX_SIZE];
-} Seleccion;
-
-Seleccion seleccion;
-*
-*/
 
 // constantes globales y flags
 int modo = 6;
@@ -160,29 +138,29 @@ void draw_objects()
                 case 1:
                     glMatrixMode(GL_MODELVIEW);
                     glPushMatrix();
-                    lata->dibujar(modo);
+                        lata->dibujar(modo);
                     glPopMatrix();
                     glPushMatrix();
-                    glTranslatef(0.5,0.28,0.5);
-                    glScalef(0.2,0.2,0.2);
-                    peon_madera->dibujar(modo);
+                        glTranslatef(0.5,0.28,0.5);
+                        glScalef(0.2,0.2,0.2);
+                        peon_madera->dibujar(modo);
                     glPopMatrix();
                     glPushMatrix();
-                    glTranslatef(0.5,0.28,-0.5);
-                    glScalef(0.2,0.2,0.2);
-                    peon_negro->dibujar(modo);
+                        glTranslatef(0.5,0.28,-0.5);
+                        glScalef(0.2,0.2,0.2);
+                        peon_negro->dibujar(modo);
                     glPopMatrix();
                     glPushMatrix();
-                    glTranslatef(0.5,0.28,0);
-                    glScalef(0.2,0.2,0.2);
-                    peon_blanco->dibujar(modo);
+                        glTranslatef(0.5,0.28,0);
+                        glScalef(0.2,0.2,0.2);
+                        peon_blanco->dibujar(modo);
                     glPopMatrix();
                     break;
                 case 2:
                     glMatrixMode(GL_MODELVIEW);
                     glPushMatrix();
-                    glScalef(0.005,0.005,0.005);
-                    torillo->dibujar(modo);
+                        glScalef(0.005,0.005,0.005);
+                        torillo->dibujar(modo);
                     glPopMatrix();
                     break;
             }
@@ -192,22 +170,22 @@ void draw_objects()
                 case 1:
                     glMatrixMode(GL_MODELVIEW);
                     glPushMatrix();
-                    glScalef(0.2,0.2,0.2);
-                    beethoven->dibujar(modo);
+                        glScalef(0.2,0.2,0.2);
+                        beethoven->dibujar(modo);
                     glPopMatrix();
                     break;
                 case 2:
                     glMatrixMode(GL_MODELVIEW);
                     glPushMatrix();
-                    glScalef(0.5,0.5,0.5);
-                    peon->dibujar(modo);
+                        glScalef(0.5,0.5,0.5);
+                        peon->dibujar(modo);
                     glPopMatrix();
                     break;
                 case 3:
                     glMatrixMode(GL_MODELVIEW);
                     glPushMatrix();
-                    glScalef(0.005,0.005,0.005);
-                    torillo->dibujar(modo);
+                        glScalef(0.005,0.005,0.005);
+                        torillo->dibujar(modo);
                     glPopMatrix();
                     break;
             }
@@ -215,18 +193,18 @@ void draw_objects()
         case 5:
             glMatrixMode(GL_MODELVIEW);
             glPushMatrix();
-            glTranslatef(0,0,0.75);
-            glScalef(0.1,0.1,0.1);
-            beethoven->dibujar(modo);
+                glTranslatef(0,0,0.75);
+                glScalef(0.1,0.1,0.1);
+                beethoven->dibujar(modo);
             glPopMatrix();
             glPushMatrix();
-            glScalef(0.1,0.1,0.1);
-            coche->dibujar(modo);
+                glScalef(0.1,0.1,0.1);
+                coche->dibujar(modo);
             glPopMatrix();
             glPushMatrix();
-            glTranslatef(0,0,-1);
-            glScalef(0.05,0.05,0.05);
-            hormiga->dibujar(modo);
+                glTranslatef(0,0,-1);
+                glScalef(0.05,0.05,0.05);
+                hormiga->dibujar(modo);
             glPopMatrix();
             break;
     }
@@ -236,23 +214,26 @@ void draw_objects_with_names() {
     switch(practica) {
         case 5:
             glMatrixMode(GL_MODELVIEW);
+            glInitNames();
+            glPushName(0);
             glPushMatrix();
-            glTranslatef(0,0,0.75);
-            glScalef(0.1,0.1,0.1);
-            glPushName(1);
-            beethoven->dibujar(modo);
+                glLoadName(1);
+                glTranslatef(0,0,0.75);
+                glScalef(0.1,0.1,0.1);
+                beethoven->dibujar(modo);
             glPopMatrix();
             glPushMatrix();
-            glScalef(0.1,0.1,0.1);
-            glPushName(2);
-            coche->dibujar(modo);
+                glLoadName(2);
+                glScalef(0.1,0.1,0.1);
+                coche->dibujar(modo);
             glPopMatrix();
             glPushMatrix();
-            glTranslatef(0,0,-1);
-            glScalef(0.05,0.05,0.05);
-            glPushName(3);
-            hormiga->dibujar(modo);
+                glLoadName(3);
+                glTranslatef(0,0,-1);
+                glScalef(0.05,0.05,0.05);
+                hormiga->dibujar(modo);
             glPopMatrix();
+            glPopName();
             break;
     }
 }
@@ -302,9 +283,9 @@ void idle()
             if(activo) {
                 glMatrixMode(GL_MODELVIEW);
                 glPushMatrix();
-                angulo += 1;
-                luz2.setPosicion(_vertex3f(-sin(angulo*M_PI/180),cos(angulo*M_PI/180),0));
-                luz2.activar();
+                    angulo += 1;
+                    luz2.setPosicion(_vertex3f(-sin(angulo*M_PI/180),cos(angulo*M_PI/180),0));
+                    luz2.activar();
                 glPopMatrix();
             } else {
                 glDisable(GL_LIGHT2);
@@ -356,7 +337,7 @@ void change_window_size(int Ancho1,int Alto1)
     glViewport(0,0,Ancho1,Alto1);
     glutPostRedisplay();
 
-/*** NEW: No se deforma al cambiar tamaño
+/*** NEW: No se deforma al cambiar tamaño. Falla con la selección
     change_projection();
     glViewport(0,0,Ancho1,Alto1);
     glMatrixMode(GL_PROJECTION);
@@ -391,6 +372,8 @@ void imprimir_ayuda() {
             cout << "E: desactivar animacion" << endl;
             cout << "3: activar escena practica 3" << endl;
             cout << "5: activar escena practica 5" << endl;
+            cout << "Click dcho: Mover" << endl;
+            cout << "Rueda: Zoom" << endl;
             cout << "H: imprimir ayuda" << endl;
             break;
         case 3:
@@ -421,6 +404,8 @@ void imprimir_ayuda() {
             cout << "E: desactivar animacion" << endl;
             cout << "4: acticar escena practica 4" << endl;
             cout << "5: acticar escena practica 5" << endl;
+            cout << "Click dcho: Mover" << endl;
+            cout << "Rueda: Zoom" << endl;
             cout << "H: imprimir ayuda" << endl;
             break;
         case 5:
@@ -434,6 +419,9 @@ void imprimir_ayuda() {
             cout << "G: modo suavizado gouraud" << endl;
             cout << "3: acticar escena practica 3" << endl;
             cout << "5: acticar escena practica 5" << endl;
+            cout << "Click izdo: Seleccionar" << endl;
+            cout << "Click dcho: Mover" << endl;
+            cout << "Rueda: Zoom" << endl;
             cout << "H: imprimir ayuda" << endl;
             break;
     }
@@ -736,56 +724,46 @@ void special_keys(int Tecla1,int x,int y)
 //***************************************************************************
 
 int pick(unsigned int x, unsigned int y) {
-    GLuint Selection_buffer[BUFFER_SIZE];
-    GLint Hits,Viewport[4];
+    GLuint Selection_buffer[BUFFER_SIZE]; // Crear buffer de datos
+    glSelectBuffer(BUFFER_SIZE,Selection_buffer); // Seleccionar buffer de datos
 
-    glGetIntegerv(GL_VIEWPORT,Viewport);
-    glSelectBuffer(BUFFER_SIZE,Selection_buffer);
+    glRenderMode(GL_SELECT); // Cambiar al modo selección
 
-    glRenderMode(GL_SELECT);
-    glInitNames();
+    GLint Hits,Viewport[4]; // Variables para el número de objetos seleccionados y volumen de visión
+    glGetIntegerv(GL_VIEWPORT,Viewport); // Redefinir volumen de visión
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPickMatrix(x,Viewport[3]-y,5.0,5.0,Viewport);
-    glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane);
-    draw_objects_with_names();
-    Hits = glRenderMode(GL_RENDER);
+    glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane); // Fijar proyección
+
+    draw_objects_with_names(); // Dibujar escena
+
+    Hits = glRenderMode(GL_RENDER); // Guardar número de objetos seleccionados
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane);
+    glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane); // Fijar proyección
 
+    // Analizar resultados
+    int encontrado = -1; // Resultado del elemento más cercano
 
     if(Hits>0) {
-        return Selection_buffer[0];
-    } else {
-        return -1;
-    }
+        unsigned int i=0; // Contador
+        float z, Zmin = INFINITY; // Valor minimo actual de z
 
-    /*
-     * NO FUNCIONA
-     *
-    seleccion.tama = Hits;
-    for(unsigned int i=0,k=0; i<seleccion.tama; i++,k+=3) {
-        seleccion.objeto[i].tama = Selection_buffer[k];
-        seleccion.objeto[i].zmin = (GLfloat)Selection_buffer[k+1]/0xFFFFFFFF;
-        seleccion.objeto[i].zmax = (GLfloat)Selection_buffer[k+2]/0xFFFFFFFF;
-        for(unsigned int j=0; j<seleccion.objeto[i].tama; j++,k++) {
-            seleccion.objeto[i].names[j] = Selection_buffer[k+3];
-        }
-    }
-    float minimo = INFINITY;
-    int resultado = -1;
-    if(seleccion.tama>0) {
-        for(unsigned int i=0; i<seleccion.tama;i++) {
-            if(seleccion.objeto[i].names[0] != -1 && seleccion.objeto[i].zmin < minimo) {
-                minimo = seleccion.objeto[i].zmin;
-                resultado = seleccion.objeto[i].names[0];
+        for(unsigned int k=0; k<Hits; ++k) { // Recorrer objetos seleccionados
+            if(Selection_buffer[i]!=0) {
+                z = Selection_buffer[i+1]; // Valor de z del objeto
+                if(z<Zmin) { // Si es menor del valor actual mínimo de z
+                    encontrado = Selection_buffer[i+3]; // Índice del elemento
+                    Zmin = z; // Actualizar Zmin
+                }
             }
+            i += Selection_buffer[i]+3; // Nos movemos al siguiente
         }
     }
-    return resultado;
-    *
-    */
+    return encontrado;
 }
 
 //***************************************************************************
@@ -805,10 +783,10 @@ void click_raton(int boton, int estado, int x, int y) {
             if(practica == 5 && estado == GLUT_DOWN) {
                 click_derecho = false;
                 encontrado = pick(x,y);
-                cout << endl << "MODO SELECCION" << endl;
+                //cout << endl << "MODO SELECCION" << endl;
                 switch(encontrado) {
                     case 1:
-                        cout << "Beethoven seleccionado" << endl;
+                        //cout << "Beethoven seleccionado" << endl;
                         if(pintado[0]) {
                             beethoven->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
                             beethoven->setDifusa(_vertex4f(0.6,0.6,0.5,1));
@@ -822,7 +800,7 @@ void click_raton(int boton, int estado, int x, int y) {
                         }
                         break;
                     case 2:
-                        cout << "Coche seleccionado" << endl;
+                        //cout << "Coche seleccionado" << endl;
                         if(pintado[1]) {
                             coche->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
                             coche->setDifusa(_vertex4f(0.6,0.6,0.5,1));
@@ -836,7 +814,7 @@ void click_raton(int boton, int estado, int x, int y) {
                         }
                         break;
                     case 3:
-                        cout << "Hormiga seleccionada" << endl;
+                        //cout << "Hormiga seleccionada" << endl;
                         if(pintado[2]) {
                             hormiga->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
                             hormiga->setDifusa(_vertex4f(0.6,0.6,0.5,1));
@@ -850,7 +828,7 @@ void click_raton(int boton, int estado, int x, int y) {
                         }
                         break;
                     default:
-                        cout << "Nada seleccionado" << endl;
+                        //cout << "Nada seleccionado" << endl;
                         break;
                 }
             }
