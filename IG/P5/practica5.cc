@@ -18,7 +18,7 @@
 using namespace std;
 
 // tamaño de los ejes
-const int AXIS_SIZE=5000;
+const int AXIS_SIZE=10000;
 const int BUFFER_SIZE=512;
 
 // constantes globales y flags
@@ -63,14 +63,13 @@ GLfloat Observer_angle_y;
 GLfloat Window_width,Window_height,Front_plane,Back_plane;
 
 // variables que determninan la posicion y tamaño de la ventana X
-int UI_window_pos_x=50,UI_window_pos_y=50,UI_window_width=500,UI_window_height=500;
+int UI_window_pos_x=50,UI_window_pos_y=50,UI_window_width=800,UI_window_height=450;
 
 //**************************************************************************
 //
 //**************************************************************************
 
-void clear_window()
-{
+void clear_window() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
@@ -79,11 +78,9 @@ void clear_window()
 // Funcion para definir la transformación de proyeccion
 //**************************************************************************
 
-void change_projection()
-{
+void change_projection() {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-
     // formato(x_minimo,x_maximo, y_minimo, y_maximo,Front_plane, plano_traser)
     // Front_plane>0  Back_plane>PlanoDelantero)
     glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane);
@@ -93,8 +90,7 @@ void change_projection()
 // Funcion para definir la transformación de vista (posicionar la camara)
 //**************************************************************************
 
-void change_observer()
-{
+void change_observer() {
     // posicion del observador
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -107,8 +103,7 @@ void change_observer()
 // Funcion que dibuja los ejes utilizando la primitiva grafica de lineas
 //**************************************************************************
 
-void draw_axis()
-{
+void draw_axis() {
     glBegin(GL_LINES);
     // eje X, color rojo
     glColor3f(1,0,0);
@@ -125,13 +120,34 @@ void draw_axis()
     glEnd();
 }
 
+//***************************************************************************
+// Funcion llamada cuando se produce un cambio en el tamaño de la ventana
+//
+// el evento manda a la funcion:
+// nuevo ancho
+// nuevo alto
+//***************************************************************************
+
+void change_window_size(int Ancho1,int Alto1) {
+    change_projection();
+    glViewport(0,0,Ancho1,Alto1);
+    glutPostRedisplay();
+}
+
+//**************************************************************************
+// Luces
+//**************************************************************************
+
+void draw_lights(void) {
+    luz0.activar();
+    luz1.activar();
+}
 
 //**************************************************************************
 // Funcion que dibuja los objetos
 //**************************************************************************
 
-void draw_objects()
-{
+void draw_objects() {
     switch(practica) {
         case 4:
             switch(figura) {
@@ -210,6 +226,10 @@ void draw_objects()
     }
 }
 
+//**************************************************************************
+// Funcion que dibuja los objetos con nombres
+//**************************************************************************
+
 void draw_objects_with_names() {
     switch(practica) {
         case 5:
@@ -242,8 +262,7 @@ void draw_objects_with_names() {
 // Funcion que anima los objetos
 //**************************************************************************
 
-void idle()
-{
+void idle() {
     switch(practica) {
         case 3:
             if(activo) {
@@ -297,56 +316,34 @@ void idle()
 }
 
 //**************************************************************************
-// Luces
-//**************************************************************************
-
-void draw_lights(void)
-{
-    luz0.activar();
-    luz1.activar();
-}
-
-//**************************************************************************
 // Escena
 //**************************************************************************
 
-void draw_scene(void)
-{
+void draw_scene(void) {
     clear_window();
     change_observer();
     draw_axis();
     draw_objects();
-    if(practica == 4 || practica == 5) { // MODO PRACTICA 4
+    if(practica == 4 || practica == 5) {
         draw_lights();
     }
     glutSwapBuffers();
 }
 
+//**************************************************************************
+// Escena con nombres
+//**************************************************************************
 
-//***************************************************************************
-// Funcion llamada cuando se produce un cambio en el tamaño de la ventana
-//
-// el evento manda a la funcion:
-// nuevo ancho
-// nuevo alto
-//***************************************************************************
-
-void change_window_size(int Ancho1,int Alto1)
-{
-    change_projection();
-    glViewport(0,0,Ancho1,Alto1);
-    glutPostRedisplay();
-
-/*** NEW: No se deforma al cambiar tamaño. Falla con la selección
-    change_projection();
-    glViewport(0,0,Ancho1,Alto1);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(60,(GLfloat)Ancho1/(GLfloat)Alto1,1.0,100.0);
-    glMatrixMode(GL_MODELVIEW);
-**************************************/
+void draw_scene_with_names(void) {
+    clear_window();
+    change_observer();
+    draw_axis();
+    draw_objects_with_names();
+    if(practica == 4 || practica == 5) {
+        draw_lights();
+    }
+    glutSwapBuffers();
 }
-
 //***************************************************************************
 // Imprimir ayuda
 //***************************************************************************
@@ -436,8 +433,7 @@ void imprimir_ayuda() {
 // posicion y del raton
 //***************************************************************************
 
-void normal_keys(unsigned char Tecla1,int x,int y)
-{
+void normal_keys(unsigned char Tecla1,int x,int y) {
     switch(practica) {
         case 4:
             switch (toupper(Tecla1)) {
@@ -706,8 +702,7 @@ void normal_keys(unsigned char Tecla1,int x,int y)
 
 //***************************************************************************
 
-void special_keys(int Tecla1,int x,int y)
-{
+void special_keys(int Tecla1,int x,int y) {
     switch (Tecla1) {
         case GLUT_KEY_LEFT:Observer_angle_y--;break;
         case GLUT_KEY_RIGHT:Observer_angle_y++;break;
@@ -724,12 +719,11 @@ void special_keys(int Tecla1,int x,int y)
 //***************************************************************************
 
 int pick(unsigned int x, unsigned int y) {
-    GLuint Selection_buffer[BUFFER_SIZE]; // Crear buffer de datos
-    glSelectBuffer(BUFFER_SIZE,Selection_buffer); // Seleccionar buffer de datos
+    GLuint Hits, Selection_buffer[BUFFER_SIZE]; // Objetos seleccionados y Buffer de datos
+    GLint Viewport[4]; // Volumen de visión
 
+    glSelectBuffer(BUFFER_SIZE,Selection_buffer); // Crear buffer de datos
     glRenderMode(GL_SELECT); // Cambiar al modo selección
-
-    GLint Hits,Viewport[4]; // Variables para el número de objetos seleccionados y volumen de visión
     glGetIntegerv(GL_VIEWPORT,Viewport); // Redefinir volumen de visión
 
     glMatrixMode(GL_PROJECTION);
@@ -737,8 +731,7 @@ int pick(unsigned int x, unsigned int y) {
     gluPickMatrix(x,Viewport[3]-y,5.0,5.0,Viewport);
     glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane); // Fijar proyección
 
-    draw_objects_with_names(); // Dibujar escena
-
+    draw_scene_with_names(); // Dibujar escena
     Hits = glRenderMode(GL_RENDER); // Guardar número de objetos seleccionados
 
     glMatrixMode(GL_PROJECTION);
@@ -747,7 +740,6 @@ int pick(unsigned int x, unsigned int y) {
 
     // Analizar resultados
     int encontrado = -1; // Resultado del elemento más cercano
-
     if(Hits>0) {
         unsigned int i=0; // Contador
         float z, Zmin = INFINITY; // Valor minimo actual de z
@@ -763,6 +755,7 @@ int pick(unsigned int x, unsigned int y) {
             i += Selection_buffer[i]+3; // Nos movemos al siguiente
         }
     }
+
     return encontrado;
 }
 
@@ -870,8 +863,8 @@ void raton_movido(int x, int y) {
 
 void initialize(void) {
     // se inicalizan la ventana y los planos de corte
-    Window_width=.5;
-    Window_height=.5;
+    Window_width=.64;
+    Window_height=.36;
     Front_plane=1;
     Back_plane=1000;
 
@@ -882,7 +875,7 @@ void initialize(void) {
 
     // se indica cual sera el color para limpiar la ventana	(r,v,a,al)
     // blanco=(1,1,1,1) rojo=(1,0,0,1), ...
-    glClearColor(1,1,1,1);
+    glClearColor(0.3,0.3,0.3,1);
 
     // se habilita el z-bufer
     glEnable(GL_DEPTH_TEST);
