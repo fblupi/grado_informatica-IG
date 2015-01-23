@@ -31,14 +31,12 @@ bool modelado = false;
 bool subiendo = true;
 bool avanzando = true;
 bool click_derecho = false;
-vector<bool> pintado(3,false);
+vector<bool> pintado(9,false);
 Figura *peon_madera;
 Figura *peon_negro;
 Figura *peon_blanco;
 Figura *peon;
 Figura *beethoven;
-Figura *hormiga;
-Figura *coche;
 Lata *lata;
 Torillo * torillo;
 Luz luz0;
@@ -208,20 +206,24 @@ void draw_objects() {
             break;
         case 5:
             glMatrixMode(GL_MODELVIEW);
-            glPushMatrix();
-                glTranslatef(0,0,0.75);
-                glScalef(0.1,0.1,0.1);
-                beethoven->dibujar(modo);
-            glPopMatrix();
-            glPushMatrix();
-                glScalef(0.1,0.1,0.1);
-                coche->dibujar(modo);
-            glPopMatrix();
-            glPushMatrix();
-                glTranslatef(0,0,-1);
-                glScalef(0.05,0.05,0.05);
-                hormiga->dibujar(modo);
-            glPopMatrix();
+            for(unsigned int i=0; i<3; i++) {
+                for(unsigned int j=0; j<3; j++) {
+                    glPushMatrix();
+                        if(pintado[i*3+j]) {
+                            beethoven->setAmbiental(_vertex4f(0.7,0.1,0.1,1));
+                            beethoven->setDifusa(_vertex4f(0.7,0.1,0.1,1));
+                            beethoven->setEspecular(_vertex4f(0.7,0.1,0.1,1));
+                        } else {
+                            beethoven->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
+                            beethoven->setDifusa(_vertex4f(0.6,0.6,0.5,1));
+                            beethoven->setEspecular(_vertex4f(0.6,0.6,0.5,1));
+                        }
+                        glTranslatef(j-1.0,0,0.75*i-0.75);
+                        glScalef(0.1,0.1,0.1);
+                        beethoven->dibujar(modo);
+                    glPopMatrix();
+                }
+            }
             break;
     }
 }
@@ -236,23 +238,25 @@ void draw_objects_with_names() {
             glMatrixMode(GL_MODELVIEW);
             glInitNames();
             glPushName(0);
-            glPushMatrix();
-                glLoadName(1);
-                glTranslatef(0,0,0.75);
-                glScalef(0.1,0.1,0.1);
-                beethoven->dibujar(modo);
-            glPopMatrix();
-            glPushMatrix();
-                glLoadName(2);
-                glScalef(0.1,0.1,0.1);
-                coche->dibujar(modo);
-            glPopMatrix();
-            glPushMatrix();
-                glLoadName(3);
-                glTranslatef(0,0,-1);
-                glScalef(0.05,0.05,0.05);
-                hormiga->dibujar(modo);
-            glPopMatrix();
+            for(unsigned int i=0; i<3; i++) {
+                for(unsigned int j=0; j<3; j++) {
+                    glPushMatrix();
+                        glLoadName(i*3+j+1);
+                        if(pintado[i*3+j]) {
+                            beethoven->setAmbiental(_vertex4f(0.7,0.1,0.1,1));
+                            beethoven->setDifusa(_vertex4f(0.7,0.1,0.1,1));
+                            beethoven->setEspecular(_vertex4f(0.7,0.1,0.1,1));
+                        } else {
+                            beethoven->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
+                            beethoven->setDifusa(_vertex4f(0.6,0.6,0.5,1));
+                            beethoven->setEspecular(_vertex4f(0.6,0.6,0.5,1));
+                        }
+                        glTranslatef(j-1.0,0,0.75*i-0.75);
+                        glScalef(0.1,0.1,0.1);
+                        beethoven->dibujar(modo);
+                    glPopMatrix();
+                }
+            }
             glPopName();
             break;
     }
@@ -776,52 +780,71 @@ void click_raton(int boton, int estado, int x, int y) {
             if(practica == 5 && estado == GLUT_DOWN) {
                 click_derecho = false;
                 encontrado = pick(x,y);
-                //cout << endl << "MODO SELECCION" << endl;
                 switch(encontrado) {
                     case 1:
-                        //cout << "Beethoven seleccionado" << endl;
                         if(pintado[0]) {
-                            beethoven->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
-                            beethoven->setDifusa(_vertex4f(0.6,0.6,0.5,1));
-                            beethoven->setEspecular(_vertex4f(0.6,0.6,0.5,1));
                             pintado[0] = false;
                         } else {
-                            beethoven->setAmbiental(_vertex4f(0.7,0.1,0.1,1));
-                            beethoven->setDifusa(_vertex4f(0.7,0.1,0.1,1));
-                            beethoven->setEspecular(_vertex4f(0.7,0.1,0.1,1));
                             pintado[0] = true;
                         }
                         break;
                     case 2:
-                        //cout << "Coche seleccionado" << endl;
                         if(pintado[1]) {
-                            coche->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
-                            coche->setDifusa(_vertex4f(0.6,0.6,0.5,1));
-                            coche->setEspecular(_vertex4f(0.6,0.6,0.5,1));
                             pintado[1] = false;
                         } else {
-                            coche->setAmbiental(_vertex4f(0.7,0.1,0.1,1));
-                            coche->setDifusa(_vertex4f(0.7,0.1,0.1,1));
-                            coche->setEspecular(_vertex4f(0.7,0.1,0.1,1));
                             pintado[1] = true;
                         }
                         break;
                     case 3:
-                        //cout << "Hormiga seleccionada" << endl;
                         if(pintado[2]) {
-                            hormiga->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
-                            hormiga->setDifusa(_vertex4f(0.6,0.6,0.5,1));
-                            hormiga->setEspecular(_vertex4f(0.6,0.6,0.5,1));
                             pintado[2] = false;
                         } else {
-                            hormiga->setAmbiental(_vertex4f(0.7,0.1,0.1,1));
-                            hormiga->setDifusa(_vertex4f(0.7,0.1,0.1,1));
-                            hormiga->setEspecular(_vertex4f(0.7,0.1,0.1,1));
                             pintado[2] = true;
                         }
                         break;
+                    case 4:
+                        if(pintado[3]) {
+                            pintado[3] = false;
+                        } else {
+                            pintado[3] = true;
+                        }
+                        break;
+                    case 5:
+                        if(pintado[4]) {
+                            pintado[4] = false;
+                        } else {
+                            pintado[4] = true;
+                        }
+                        break;
+                    case 6:
+                        if(pintado[5]) {
+                            pintado[5] = false;
+                        } else {
+                            pintado[5] = true;
+                        }
+                        break;
+                    case 7:
+                        if(pintado[6]) {
+                            pintado[6] = false;
+                        } else {
+                            pintado[6] = true;
+                        }
+                        break;
+                    case 8:
+                        if(pintado[7]) {
+                            pintado[7] = false;
+                        } else {
+                            pintado[7] = true;
+                        }
+                        break;
+                    case 9:
+                        if(pintado[8]) {
+                            pintado[8] = false;
+                        } else {
+                            pintado[8] = true;
+                        }
+                        break;
                     default:
-                        //cout << "Nada seleccionado" << endl;
                         break;
                 }
             }
@@ -961,24 +984,6 @@ void initialize(void) {
     beethoven->setDifusa(_vertex4f(0.6,0.6,0.5,1));
     beethoven->setEspecular(_vertex4f(0.6,0.6,0.5,1));
     beethoven->setBrillo(40);
-
-    hormiga = new Figura();
-    hormiga->model_ply("D://PLY//ant");
-    hormiga->calcular_normales_triangulos();
-    hormiga->calcular_normales_vertices();
-    hormiga->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
-    hormiga->setDifusa(_vertex4f(0.6,0.6,0.5,1));
-    hormiga->setEspecular(_vertex4f(0.6,0.6,0.5,1));
-    hormiga->setBrillo(40);
-
-    coche = new Figura();
-    coche->model_ply("D://PLY//big_dodge");
-    coche->calcular_normales_triangulos();
-    coche->calcular_normales_vertices();
-    coche->setAmbiental(_vertex4f(0.6,0.6,0.5,1));
-    coche->setDifusa(_vertex4f(0.6,0.6,0.5,1));
-    coche->setEspecular(_vertex4f(0.6,0.6,0.5,1));
-    coche->setBrillo(40);
 
     glutIdleFunc(idle);
 }
