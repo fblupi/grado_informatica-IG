@@ -1,10 +1,10 @@
 # README #
 
-Grado Ingeniería Informática UGR.
+Grado Ingeniería Informática UGR
 
 ### What is this repository for? ###
 
-* Prácticas de asignaturas.
+* Prácticas de asignaturas
 * Versión 3.1
 
 ### Who do I talk to? ###
