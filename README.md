@@ -1,12 +1,10 @@
-# README #
+# Grado Ingeniería Informática UGR #
 
-Grado Ingeniería Informática UGR
-
-### What is this repository for? ###
+### Datos ###
 
 * Prácticas de asignaturas
 * Versión 3.1
 
-### Who do I talk to? ###
+### Contacto ###
 
 * Francisco Javier Bolívar Lupiáñez (fboli94@gmail.com)
