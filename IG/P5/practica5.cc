@@ -744,19 +744,20 @@ int pick(unsigned int x, unsigned int y) {
 
     // Analizar resultados
     int encontrado = -1; // Resultado del elemento más cercano
-    if(Hits>0) {
-        unsigned int i=0; // Contador
+
+    if(Hits>0) { // Hay algún objeto
+        unsigned int i=0; // Contador del buffer
         float z, Zmin = INFINITY; // Valor minimo actual de z
 
         for(unsigned int k=0; k<Hits; ++k) { // Recorrer objetos seleccionados
-            if(Selection_buffer[i]!=0) {
-                z = Selection_buffer[i+1]; // Valor de z del objeto
-                if(z<Zmin) { // Si es menor del valor actual mínimo de z
-                    encontrado = Selection_buffer[i+3]; // Índice del elemento
+            if(Selection_buffer[i]!=0) { // Hay nombres en la pila
+                z = Selection_buffer[i+1]; // Valor de z min del objeto
+                if(z<Zmin) { // Si es menor que el valor actual mínimo de z
+                    encontrado = Selection_buffer[i+3]; // Índice del elemento (solo un nivel jerárquico de nombres)
                     Zmin = z; // Actualizar Zmin
                 }
             }
-            i += Selection_buffer[i]+3; // Nos movemos al siguiente
+            i += Selection_buffer[i]+3; // Nos movemos al siguiente (N+Zmin+Zmax=3)+N
         }
     }
 
