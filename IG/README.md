@@ -5,7 +5,7 @@ Informática Gráfica
 ### What is this repository for? ###
 
 * Prácticas de la asignatura Informática Gráfica
-* 5
+* Versión 5
 
 ### How do I get set up? ###
 
