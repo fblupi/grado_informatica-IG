@@ -1,10 +1,10 @@
 // *********************************************************************
 // **
-// ** Función ply::read (declaraciones)
+// ** Funcion ply::read (declaraciones)
 // **
-// ** Carlos Ureña - 2012- 2013
+// ** Carlos Urena - 2012- 2013
 // **
-// ** Más información y versión actualizada en:
+// ** Mas informacion y version actualizada en:
 // ** http://lsi.ugr.es/curena/varios/plys
 // **
 // ** This program is free software: you can redistribute it and/or modify
@@ -109,7 +109,7 @@ void read_vertices
    leer_cabecera( src, num_vertices, num_caras, false ) ;
    leer_vertices( num_vertices, vertices, src ) ;
 
-   cout << "archivo ply leido (únicamente vértices)" << endl << flush ;
+   cout << "archivo ply leido (unicamente vertices)" << endl << flush ;
 }
 
 
@@ -122,16 +122,16 @@ void leer_vertices( unsigned num_vertices, vector<float> & vertices, ifstream & 
    string
       token ;
 
-   // leer vértices:
+   // leer vertices:
 
    vertices.resize( num_vertices*3 );
 
-   cout << "  leyendo " << num_vertices << " vértices ...." << endl << flush ;
+   cout << "  leyendo " << num_vertices << " vertices ...." << endl << flush ;
 
    for( long long iv = 0 ; iv < num_vertices ; iv++ )
    {
       if ( src.eof() )
-         error("fin de archivo prematuro en la lista de vértices");
+         error("fin de archivo prematuro en la lista de vertices");
 
       double x,y,z ;
 
@@ -146,7 +146,7 @@ void leer_vertices( unsigned num_vertices, vector<float> & vertices, ifstream & 
       vertices[base+1] = y ;
       vertices[base+2] = z ;
    }
-   cout << "  fin de la lista de vértices" << endl << flush ;
+   cout << "  fin de la lista de vertices" << endl << flush ;
 }
 
 //**********************************************************************
@@ -172,7 +172,7 @@ void leer_caras( unsigned num_vertices, unsigned num_caras, vector<int> & caras,
       //cout << "reading face #" << ifa << " with " << nv << " vertexes: " ;
 
       if ( nv != 3 )
-         error("encontrada una cara con un número de vértices distinto de 3");
+         error("encontrada una cara con un numero de vertices distinto de 3");
 
       long long iv0, iv1, iv2 ;
 
@@ -180,7 +180,7 @@ void leer_caras( unsigned num_vertices, unsigned num_caras, vector<int> & caras,
       //cout << " " << iv0 << ", " << iv1 << ", " << iv2 << endl ;
 
       if ( iv0 >= num_vertices || iv1 >= num_vertices || iv2 >= num_vertices )
-         error("encontrado algún índice de vértice igual o superior al número de vértices");
+         error("encontrado algun indice de vertice igual o superior al numero de vertices");
 
       src.getline(buffer,tam_buffer); // ignore more properties, so far ...
 
@@ -201,7 +201,7 @@ void leer_cabecera( ifstream &src, unsigned & num_vertices, unsigned & num_caras
    string
       token ;
    unsigned
-      state = 0; // 0 antes de leer 'element vertex' (o 'element face'), 1 antes de leer 'element face', 2 después
+      state = 0; // 0 antes de leer 'element vertex' (o 'element face'), 1 antes de leer 'element face', 2 despues
    bool
       en_cabecera = true ;
    long long int
@@ -239,16 +239,16 @@ void leer_cabecera( ifstream &src, unsigned & num_vertices, unsigned & num_caras
      {  src >> token ;
         if ( token == "vertex" )
         {  if ( state != 0 )
-              error("la línea 'element vertex' va después de 'element face'");
+              error("la linea 'element vertex' va despues de 'element face'");
            src >> nv ;
-           cout << "  numero de vértices == " << nv << endl ;
+           cout << "  numero de vertices == " << nv << endl ;
            state = lee_num_caras ? 1 : 2 ;
         }
         else if ( lee_num_caras && token == "face" )
         {  if ( state != 1 )
-              error("'element vertex' va después de 'element face'");
+              error("'element vertex' va despues de 'element face'");
            src >> nc ;
-           cout << "  número de caras == " << nc << endl ;
+           cout << "  numero de caras == " << nc << endl ;
            state = 2 ;
         }
         else
@@ -262,18 +262,18 @@ void leer_cabecera( ifstream &src, unsigned & num_vertices, unsigned & num_caras
    } // end of while( en_cabecera )
 
    if ( nv <= 0 )
-      error("no se ha encontrado el número de vértices, o bien es 0 o negativo");
+      error("no se ha encontrado el numero de vertices, o bien es 0 o negativo");
 
 
    if ( lee_num_caras ) if ( nc <= 0 )
-      error("no se ha encontrado el número de caras, o bien es 0 o negativo");
+      error("no se ha encontrado el numero de caras, o bien es 0 o negativo");
 
    if ( nv > numeric_limits<int>::max() )
-      error("el número de vértices es superior al valor 'int' más grande posible.");
+      error("el numero de vertices es superior al valor 'int' mas grande posible.");
 
    if ( lee_num_caras )
    if ( nc > numeric_limits<int>::max() )
-      error("el número de caras es superior al valor 'int' más grande posible.");
+      error("el numero de caras es superior al valor 'int' mas grande posible.");
 
    num_vertices = unsigned(nv) ;
    num_caras    = unsigned(nc) ;

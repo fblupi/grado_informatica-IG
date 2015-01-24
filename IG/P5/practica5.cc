@@ -30,7 +30,7 @@ bool activo = false;
 bool modelado = false;
 bool subiendo = true;
 bool avanzando = true;
-bool click_derecho = false;
+bool click_central = false;
 vector<bool> pintado(9,false);
 Figura *peon_madera;
 Figura *peon_negro;
@@ -373,7 +373,7 @@ void imprimir_ayuda() {
             cout << "E: desactivar animacion" << endl;
             cout << "3: activar escena practica 3" << endl;
             cout << "5: activar escena practica 5" << endl;
-            cout << "Click dcho: Mover" << endl;
+            cout << "Click central: Mover" << endl;
             cout << "Rueda: Zoom" << endl;
             cout << "H: imprimir ayuda" << endl;
             break;
@@ -405,7 +405,7 @@ void imprimir_ayuda() {
             cout << "E: desactivar animacion" << endl;
             cout << "4: acticar escena practica 4" << endl;
             cout << "5: acticar escena practica 5" << endl;
-            cout << "Click dcho: Mover" << endl;
+            cout << "Click central: Mover" << endl;
             cout << "Rueda: Zoom" << endl;
             cout << "H: imprimir ayuda" << endl;
             break;
@@ -420,8 +420,8 @@ void imprimir_ayuda() {
             cout << "G: modo suavizado gouraud" << endl;
             cout << "3: acticar escena practica 3" << endl;
             cout << "5: acticar escena practica 5" << endl;
-            cout << "Click izdo: Seleccionar" << endl;
-            cout << "Click dcho: Mover" << endl;
+            cout << "Click izquierdo: Seleccionar" << endl;
+            cout << "Click central: Mover" << endl;
             cout << "Rueda: Zoom" << endl;
             cout << "H: imprimir ayuda" << endl;
             break;
@@ -501,6 +501,7 @@ void normal_keys(unsigned char Tecla1,int x,int y) {
                     practica=3;
                     modo=4;
                     figura=3;
+                    activo = false;
                     glDisable(GL_LIGHTING);
                     glDisable(GL_LIGHT0);
                     glDisable(GL_LIGHT1);
@@ -682,6 +683,7 @@ void normal_keys(unsigned char Tecla1,int x,int y) {
                     practica=3;
                     modo=4;
                     figura=3;
+                    activo = false;
                     glDisable(GL_LIGHTING);
                     glDisable(GL_LIGHT0);
                     glDisable(GL_LIGHT1);
@@ -749,7 +751,7 @@ int pick(unsigned int x, unsigned int y) {
         unsigned int i=0; // Contador del buffer
         float z, Zmin = INFINITY; // Valor minimo actual de z
 
-        for(unsigned int k=0; k<Hits; ++k) { // Recorrer objetos seleccionados
+        for(unsigned int k=0; k<Hits; k++) { // Recorrer objetos seleccionados
             if(Selection_buffer[i]!=0) { // Hay nombres en la pila
                 z = Selection_buffer[i+1]; // Valor de z min del objeto
                 if(z<Zmin) { // Si es menor que el valor actual mínimo de z
@@ -779,7 +781,7 @@ void click_raton(int boton, int estado, int x, int y) {
     switch(boton) {
         case GLUT_LEFT_BUTTON:
             if(practica == 5 && estado == GLUT_DOWN) {
-                click_derecho = false;
+                click_central = false;
                 encontrado = pick(x,y);
                 switch(encontrado) {
                     case 1:
@@ -850,21 +852,21 @@ void click_raton(int boton, int estado, int x, int y) {
                 }
             }
             break;
-        case GLUT_RIGHT_BUTTON:
+        case GLUT_MIDDLE_BUTTON:
             if(estado == GLUT_DOWN) {
-                click_derecho = true;
+                click_central = true;
                 mouse_x = x;
                 mouse_y = y;
                 glutPostRedisplay();
             }
             break;
         case 3:
-            click_derecho = false;
+            click_central = false;
             Observer_distance/=1.1;
             glutPostRedisplay();
             break;
         case 4:
-            click_derecho = false;
+            click_central = false;
             Observer_distance*=1.1;
             glutPostRedisplay();
             break;
@@ -872,7 +874,7 @@ void click_raton(int boton, int estado, int x, int y) {
 }
 
 void raton_movido(int x, int y) {
-    if(click_derecho) {
+    if(click_central) {
         Observer_angle_x += (y - mouse_y);
         Observer_angle_y += (x - mouse_x);
         mouse_x = x;
