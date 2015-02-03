@@ -1,32 +1,36 @@
 //**************************************************************************
-// Examen Febrero 2013
+// Examen Febrero 2014
 //
 // Francisco Javier Bolívar Lupiáñez
 //
-// Ejercicio 4: Describir como se puede resaltar los triángulos de una malla
-//              cuando el cursor pasa por encima de ellos.
+// Ejercicio 3: Se desea hacer una función para visualizar una imagen. La
+//              función debe cargar la imagen como una textura y
+//              visualizarla aplicándola sobre un quad. Indica usando
+//              pseudocódigo cómo dibujarías el quad y como le aplicarías
+//              la textura para permitir que se pueda hacer zoom y
+//              desplazamientos de la imagen. Suponer que la imagen es
+//              cuadrada.
 //**************************************************************************
 
 #include "stdlib.h"
 #include "stdio.h"
 #include <GL/glut.h>
 #include <ctype.h>
-#include "user_code.h"
 #include "vertex.h"
 #include <vector>
 #include <windows.h>
+#include <jpg_imagen.hpp>
 
 using namespace std;
 
 
 // tamaño de los ejes
 const int AXIS_SIZE=5000;
-const int BUFFER_SIZE=1024;
 
-// constantes globales con los vertices y triangulos y flags;
-vector<_vertex3f> v;
-vector<_vertex3i> t;
-unsigned int resaltado = 0;
+// variables textura
+unsigned int tamx, tamy, id;
+unsigned char *texels;
+_vertex2f mapsd, mapsi, mapid, mapii;
 
 // variables que definen la posicion de la camara en coordenadas polares
 GLfloat Observer_distance;
@@ -106,18 +110,19 @@ void draw_axis()
 
 void draw_objects()
 {
-    dibujar(v,t,resaltado);
-}
-
-//**************************************************************************
-// Funcion que dibuja los objetos y les asigna nombres
-//***************************************************************************
-
-void draw_objects_names() {
-    glInitNames();
-    glPushName(0);
-    dibujar_nombres(v,t);
-    glPopName();
+    glEnable(GL_TEXTURE_2D);
+    glColor3f(1,1,1);
+    glBegin(GL_QUADS);
+        glTexCoord2f(mapii.s,mapii.t);
+        glVertex3f(-1,-1,0);
+        glTexCoord2f(mapid.s,mapid.t);
+        glVertex3f(1,-1,0);
+        glTexCoord2f(mapsd.s,mapsd.t);
+        glVertex3f(1,1,0);
+        glTexCoord2f(mapsi.s,mapsi.t);
+        glVertex3f(-1,1,0);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
 }
 
 //**************************************************************************
@@ -161,9 +166,58 @@ void change_window_size(int Ancho1,int Alto1)
 
 void normal_keys(unsigned char Tecla1,int x,int y)
 {
-    switch (toupper(Tecla1)) {
+    // Para resolver el problema de ver si num==0, hago num-0.05>0
+    switch (Tecla1) {
         case 'Q': exit(0); break;
+        case 'q': exit(0); break;
+        case 'Z':
+            if(mapsd.s-mapsi.s>.2 && mapid.s-mapii.s>.2 &&
+               mapii.t-mapsi.t>.2 && mapid.t-mapsd.t>.2) {
+                mapii.s+=0.1; mapii.t-=0.1;
+                mapid.s-=0.1; mapid.t-=0.1;
+                mapsi.s+=0.1; mapsi.t+=0.1;
+                mapsd.s-=0.1; mapsd.t+=0.1;
+            }
+            break;
+        case 'z':
+            if(mapsd.s-mapsi.s<1.0 && mapid.s-mapii.s<1.0 &&
+               mapii.t-mapsi.t<1.0 && mapid.t-mapsd.t<1.0 &&
+               mapii.s-0.05>0 && mapii.t!=1.0 &&
+               mapid.s!=1.0 && mapid.t!=1.0 &&
+               mapsd.s!=1.0 && mapsd.t-0.05>0 &&
+               mapsi.s-0.05>0 && mapsi.t-0.05>0) {
+                mapii.s-=0.1; mapii.t+=0.1;
+                mapid.s+=0.1; mapid.t+=0.1;
+                mapsi.s-=0.1; mapsi.t-=0.1;
+                mapsd.s+=0.1; mapsd.t-=0.1;
+            }
+            break;
+        case 'X':
+            if(mapsd.s!=1.0 && mapid.s!=1.0) {
+                mapsd.s+=0.1; mapsi.s+=0.1;
+                mapid.s+=0.1; mapii.s+=0.1;
+            }
+            break;
+        case 'x':
+            if(mapsi.s-0.05>0 && mapii.s-0.05>0) {
+                mapsd.s-=0.1; mapsi.s-=0.1;
+                mapid.s-=0.1; mapii.s-=0.1;
+            }
+            break;
+        case 'Y':
+            if(mapii.t!=1.0 && mapid.t!=1.0) {
+                mapsd.t+=0.1; mapsi.t+=0.1;
+                mapid.t+=0.1; mapii.t+=0.1;
+            }
+            break;
+        case 'y':
+            if(mapsi.t-0.05>0 && mapsd.t-0.05>0) {
+                mapsd.t-=0.1; mapsi.t-=0.1;
+                mapid.t-=0.1; mapii.t-=0.1;
+            }
+            break;
     }
+    glutPostRedisplay();
 }
 
 //***************************************************************************
@@ -190,67 +244,6 @@ void special_keys(int Tecla1,int x,int y)
 }
 
 //***************************************************************************
-// Funcion selección al hacer click
-//***************************************************************************
-
-int pick(unsigned int x, unsigned int y) {
-    GLuint Hits, Selection_buffer[BUFFER_SIZE]; // Objetos seleccionados y Buffer de datos
-    GLint Viewport[4]; // Volumen de visión
-
-    glSelectBuffer(BUFFER_SIZE,Selection_buffer); // Crear buffer de datos
-    glRenderMode(GL_SELECT); // Cambiar al modo selección
-    glGetIntegerv(GL_VIEWPORT,Viewport); // Redefinir volumen de visión
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPickMatrix(x,Viewport[3]-y,5.0,5.0,Viewport);
-    glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane); // Fijar proyección
-
-    draw_objects_names(); // Dibujar escena
-    Hits = glRenderMode(GL_RENDER); // Guardar número de objetos seleccionados
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane); // Fijar proyección
-
-    // Analizar resultados
-    int encontrado = -1; // Resultado del elemento más cercano
-
-    if(Hits>0) { // Hay algún objeto
-        unsigned int i=0; // Contador del buffer
-        float z, Zmin = INFINITY; // Valor minimo actual de z
-
-        for(unsigned int k=0; k<Hits; k++) { // Recorrer objetos seleccionados
-            if(Selection_buffer[i]!=0) { // Hay nombres en la pila
-                z = Selection_buffer[i+1]; // Valor de z min del objeto
-                if(z<Zmin) { // Si es menor que el valor actual mínimo de z
-                    encontrado = Selection_buffer[i+4]; // Índice del elemento
-                    Zmin = z; // Actualizar Zmin
-                }
-            }
-            i += Selection_buffer[i]+3; // Nos movemos al siguiente (N+Zmin+Zmax=3)+N
-        }
-    }
-
-    return encontrado;
-}
-
-//***************************************************************************
-// Funciones llamadas cuando se produce un evento con el ratón
-//
-// el evento manda a la funcion:
-// botón del raton
-// estado del raton
-// posicion x del raton
-// posicion y del raton
-//***************************************************************************
-
-void raton(int x, int y) {
-    resaltado = pick(x,y);
-    glutPostRedisplay();
-}
-
-//***************************************************************************
 // Funcion de incializacion
 //***************************************************************************
 
@@ -263,7 +256,7 @@ void initialize(void)
     Back_plane=10000;
 
     // se inicia la posicion del observador, en el eje z
-    Observer_distance=300*Front_plane;
+    Observer_distance=3*Front_plane;
     Observer_angle_x=0;
     Observer_angle_y=0;
 
@@ -276,8 +269,26 @@ void initialize(void)
     change_projection();
     glViewport(0,0,UI_window_width,UI_window_height);
 
-    // modelado objetos
-    model_ply("D:\\PLY\\sphere",v,t);
+    // textura
+    jpg::Imagen * pimg = NULL;
+    pimg = new jpg::Imagen("D://TEXTURES//text-lata-1.jpg");
+    tamx = pimg->tamX();
+    tamy = pimg->tamY();
+    texels = pimg->leerPixels();
+    glGenTextures(1,&id);
+    glBindTexture(GL_TEXTURE_2D,id);
+    gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGB,tamx,tamy,GL_RGB,GL_UNSIGNED_BYTE,texels);
+
+    // map inicial
+    mapsd.s=1.0;
+    mapsd.t=0.0;
+    mapsi.s=0.0;
+    mapsi.t=0.0;
+    mapid.s=1.0;
+    mapid.t=1.0;
+    mapii.s=0.0;
+    mapii.t=1.0;
+
 }
 
 
@@ -312,7 +323,7 @@ int main(int argc, char **argv)
 
     // llamada para crear la ventana, indicando el titulo (no se visualiza hasta que se llama
     // al bucle de eventos)
-    glutCreateWindow("Examen Feb. 2013 - Ejercicio 4");
+    glutCreateWindow("Examen Feb. 2014 - Ejercicio 3");
 
     // asignación de la funcion llamada "dibujar" al evento de dibujo
     glutDisplayFunc(draw_scene);
@@ -322,8 +333,6 @@ int main(int argc, char **argv)
     glutKeyboardFunc(normal_keys);
     // asignación de la funcion llamada "tecla_Especial" al evento correspondiente
     glutSpecialFunc(special_keys);
-    // Actuación sobre el ratón
-    glutPassiveMotionFunc(raton);
 
     // funcion de inicialización
     initialize();
