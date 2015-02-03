@@ -1,10 +1,13 @@
 //**************************************************************************
-// Examen Febrero 2013
+// Examen Febrero 2014
 //
 // Francisco Javier Bolívar Lupiáñez
 //
-// Ejercicio 3: Describir como se pueden seleccionar los vértices de una 
-//              malla en un programa que visualiza mallas de triángulos.
+// Ejercicio 4: Dado el modelo de una esfera aproximada como una lista de
+//              vértices y de caras traingulares, crear el código para que
+//              la esfera se muestre iluminada de color verde con brillos
+//              amarillos, poniendo una luz en el infinito con dirección
+//              (1,1,1). Usar el modo de suavizado/sombreado GL_SMOOTH.
 //**************************************************************************
 
 #include "stdlib.h"
@@ -21,12 +24,11 @@ using namespace std;
 
 // tamaño de los ejes
 const int AXIS_SIZE=5000;
-const int BUFFER_SIZE=1024;
 
 // constantes globales con los vertices y triangulos y flags;
 vector<_vertex3f> v;
 vector<_vertex3i> t;
-unsigned int resaltado = 0;
+vector<_vertex3f> nv;
 
 // variables que definen la posicion de la camara en coordenadas polares
 GLfloat Observer_distance;
@@ -99,26 +101,39 @@ void draw_axis()
     glEnd();
 }
 
-
 //**************************************************************************
 // Funcion que dibuja los objetos
 //***************************************************************************
 
 void draw_objects()
 {
-    dibujar(v,t);
-    dibujar_puntos(v,resaltado);
+    GLfloat Verde[4] = {0,0.5,0,1};
+    GLfloat Amarillo[4] = {1,1,0,1};
+    glEnable(GL_LIGHTING);
+    glEnable(GL_NORMALIZE);
+    glMaterialfv(GL_FRONT,GL_AMBIENT,(GLfloat *) &Verde);
+    glMaterialfv(GL_FRONT,GL_DIFFUSE,(GLfloat *) &Verde);
+    glMaterialfv(GL_FRONT,GL_SPECULAR,(GLfloat *)&Amarillo);
+    glMaterialf(GL_FRONT,GL_SHININESS,50);
+    dibujar(v,t,nv);
 }
 
 //**************************************************************************
-// Funcion que dibuja los objetos y les asigna nombres
+// Funcion que dibuja las luces
 //***************************************************************************
 
-void draw_objects_names() {
-    glInitNames();
-    glPushName(0);
-    dibujar_nombres(v);
-    glPopName();
+void draw_lights()
+{
+    GLfloat Posicion[4] = {1,1,1,0};
+    GLfloat Luz0[4] = {1,1,1,1};
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,GL_TRUE);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glLightfv(GL_LIGHT0,GL_POSITION,(GLfloat *) &Posicion);
+    glLightfv(GL_LIGHT0,GL_AMBIENT,(GLfloat *) &Luz0);
+    glLightfv(GL_LIGHT0,GL_SPECULAR,(GLfloat *) &Luz0);
+    glLightfv(GL_LIGHT0,GL_DIFFUSE,(GLfloat *) &Luz0);
+    glDisable(GL_LIGHTING);
 }
 
 //**************************************************************************
@@ -131,6 +146,7 @@ void draw_scene(void)
     change_observer();
     draw_axis();
     draw_objects();
+    draw_lights();
     glutSwapBuffers();
 }
 
@@ -191,68 +207,6 @@ void special_keys(int Tecla1,int x,int y)
 }
 
 //***************************************************************************
-// Funcion selección al hacer click
-//***************************************************************************
-
-int pick(unsigned int x, unsigned int y) {
-    GLuint Hits, Selection_buffer[BUFFER_SIZE]; // Objetos seleccionados y Buffer de datos
-    GLint Viewport[4]; // Volumen de visión
-
-    glSelectBuffer(BUFFER_SIZE,Selection_buffer); // Crear buffer de datos
-    glRenderMode(GL_SELECT); // Cambiar al modo selección
-    glGetIntegerv(GL_VIEWPORT,Viewport); // Redefinir volumen de visión
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPickMatrix(x,Viewport[3]-y,5.0,5.0,Viewport);
-    glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane); // Fijar proyección
-
-    draw_objects_names(); // Dibujar escena
-    Hits = glRenderMode(GL_RENDER); // Guardar número de objetos seleccionados
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane); // Fijar proyección
-
-    // Analizar resultados
-    int encontrado = -1; // Resultado del elemento más cercano
-
-    if(Hits>0) { // Hay algún objeto
-        unsigned int i=0; // Contador del buffer
-        float z, Zmin = INFINITY; // Valor minimo actual de z
-
-        for(unsigned int k=0; k<Hits; k++) { // Recorrer objetos seleccionados
-            if(Selection_buffer[i]!=0) { // Hay nombres en la pila
-                z = Selection_buffer[i+1]; // Valor de z min del objeto
-                if(z<Zmin) { // Si es menor que el valor actual mínimo de z
-                    encontrado = Selection_buffer[i+4]; // Índice del elemento
-                    Zmin = z; // Actualizar Zmin
-                }
-            }
-            i += Selection_buffer[i]+3; // Nos movemos al siguiente (N+Zmin+Zmax=3)+N
-        }
-    }
-
-    return encontrado;
-}
-
-//***************************************************************************
-// Funciones llamadas cuando se produce un evento con el ratón
-//
-// el evento manda a la funcion:
-// botón del raton
-// estado del raton
-// posicion x del raton
-// posicion y del raton
-//***************************************************************************
-
-void click_raton(int boton, int estado, int x, int y) {
-    switch(boton) {
-        default: resaltado = pick(x,y); break;
-    }
-}
-
-//***************************************************************************
 // Funcion de incializacion
 //***************************************************************************
 
@@ -280,6 +234,7 @@ void initialize(void)
 
     // modelado objetos
     model_ply("D:\\PLY\\sphere",v,t);
+    calcular_normales(v,t,nv);
 }
 
 
@@ -314,7 +269,7 @@ int main(int argc, char **argv)
 
     // llamada para crear la ventana, indicando el titulo (no se visualiza hasta que se llama
     // al bucle de eventos)
-    glutCreateWindow("Examen Feb. 2013 - Ejercicio 3");
+    glutCreateWindow("Examen Feb. 2014 - Ejercicio 4");
 
     // asignación de la funcion llamada "dibujar" al evento de dibujo
     glutDisplayFunc(draw_scene);
@@ -325,7 +280,6 @@ int main(int argc, char **argv)
     // asignación de la funcion llamada "tecla_Especial" al evento correspondiente
     glutSpecialFunc(special_keys);
     // Actuación sobre el ratón
-    glutMouseFunc(click_raton);
 
     // funcion de inicialización
     initialize();

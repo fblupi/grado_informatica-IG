@@ -3,7 +3,13 @@
 //
 // Francisco Javier Bolívar Lupiáñez
 //
-// Ejercicio 2
+// Ejercicio 2: Queremos poder seleccionar triángulos de una esfera. Al
+//              seleccionarlos se modificará el color de triángulo y el de
+//              sus vecinos de arista:
+//               -  Describe la estructura de datos que usarías para
+//                  representar la malla.
+//               -  Describe el código que se debe añadir al programa para
+//                  poder seleccionar y cambiar el color de los triángulos.
 //**************************************************************************
 
 #include "stdlib.h"

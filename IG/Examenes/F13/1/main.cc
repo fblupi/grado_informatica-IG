@@ -3,7 +3,19 @@
 //
 // Francisco Javier Bolívar Lupiáñez
 //
-// Ejercicio 1
+// Ejercicio 1: Crear un modelo jerárquico para  el objeto de la figura,
+//              dibujando el grafo del modelo. Indicar en el grafo las
+//              primitivas y transformaciones geométricas usadas y los
+//              parámetros de las transformaciones.
+//              Hay cuatro articulaciones en el modelo, representadas por
+//              arcos: Ra, Rb y Rc. Ra es un giro respecto al eje Y que
+//              afecta a todo el modelo, Rb y Rc son giros respecto al eje
+//              transversal del toro mayor, que afecta a las piezas B y C
+//              respectivamente. El toro exterior tiene radios 6.5 y 0.5;
+//              los interiores tienen radios 2.5 y 0.5. Partir de la
+//              primitiva glutSolidTorus:
+//              void glutSolidTorus(GLdouble innerRadius, GLdouble
+//                                  outerRadius, GLint nsides, GLint rings);
 //**************************************************************************
 
 #include "stdlib.h"
@@ -108,14 +120,14 @@ void draw_objects()
         glutSolidTorus(0.5,6.5,12,12);
         glPushMatrix();
             glColor3f(0,1,0);
-            glTranslatef(3,0,0);
             glRotatef(Rc,1,0,0);
+            glTranslatef(3,0,0);
             glutSolidTorus(0.5,2.5,12,12);
         glPopMatrix();
         glPushMatrix();
             glColor3f(0,0,1);
-            glTranslatef(-3,0,0);
             glRotatef(Rb,1,0,0);
+            glTranslatef(-3,0,0);
             glutSolidTorus(0.5,2.5,12,12);
         glPopMatrix();
     glPopMatrix();

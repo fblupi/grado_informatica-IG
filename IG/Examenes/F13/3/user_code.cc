@@ -33,14 +33,15 @@ void dibujar(const vector<_vertex3f> &Vertices, const vector<_vertex3i> &Triangu
 //**************************************************************************
 
 void dibujar_puntos(const vector<_vertex3f> &Vertices, const unsigned int &resaltado) {
-    glColor3f(1,1,1);
     glPointSize(5);
     glBegin(GL_POINTS);
     for(unsigned int i=0;i< Vertices.size();i++){
         if(resaltado==i) {
+            glPointSize(5);
             glColor3f(1,0,0);
         } else {
-            glColor3f(1,1,1);
+            glPointSize(5);
+            glColor3f(0,0,0);
         }
         glVertex3f(Vertices[i].x, Vertices[i].y, Vertices[i].z);
     }

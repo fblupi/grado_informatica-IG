@@ -1,3 +1,18 @@
+Indicar cual será la posición de las luz en los casos siguientes:
+a)	GLfloat Position[4]={1,1,1,0};
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glLightfv(GL_LIGHT0,GL_POSITION,Position);
+	glPopMatrix();
+b)	GLfloat Position[4]={1,1,1,0};
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glRotate(45,0,1,0);
+	glLightfv(GL_LIGHT0,GL_POSITION,Position);
+	glPopMatrix();
+
 Tanto en a como en b, la luz se encuentra en el infinito.
 En a tiene dirección (1,1,1).
 En b tiene direccion (1*cos(45)+1*sen(45),1,-1*sen(45)+1*cos(45))=(1.37,1,-0.32).

@@ -3,7 +3,8 @@
 //
 // Francisco Javier Bolívar Lupiáñez
 //
-// Ejercicio 4
+// Ejercicio 4: Describir como se puede resaltar los triángulos de una malla
+//              cuando el cursor pasa por encima de ellos.
 //**************************************************************************
 
 #include "stdlib.h"
