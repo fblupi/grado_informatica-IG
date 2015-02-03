@@ -1,0 +1,3 @@
+Tanto en a como en b, la luz se encuentra en el infinito.
+En a tiene dirección (1,1,1).
+En b tiene direccion (1*cos(45)+1*sen(45),1,-1*sen(45)+1*cos(45))=(1.37,1,-0.32).
